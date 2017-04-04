@@ -856,7 +856,7 @@ class Client(object):
         """
         return self._get('/v1/auth/approle/role/{0}'.format(role_name)).json()
 
-    def create_role_secret_id(self, role_name, meta=None):
+    def create_role_secret_id(self, role_name, meta=None, cidr_list=None):
         """
         POST /auth/approle/role/<role name>/secret-id
         """
@@ -865,6 +865,8 @@ class Client(object):
         params = {}
         if meta is not None:
             params['metadata'] = json.dumps(meta)
+        if cidr_list is not None:
+            params['cidr_list'] = cidr_list
 
         return self._post(url, json=params).json()
 
@@ -909,7 +911,7 @@ class Client(object):
         url = '/v1/auth/approle/role/{0}/secret-id-accessor/{1}'.format(role_name, secret_id_accessor)
         self._delete(url)
 
-    def create_role_custom_secret_id(self, role_name, secret_id, meta=None):
+    def create_role_custom_secret_id(self, role_name, secret_id, meta=None, cidr_list=None):
         """
         POST /auth/approle/role/<role name>/custom-secret-id
         """
@@ -919,9 +921,12 @@ class Client(object):
         }
         if meta is not None:
             params['meta'] = meta
+        if cidr_list is not None:
+            params['cidr_list'] = cidr_list
+
         return self._post(url, json=params).json()
 
-    def auth_approle(self, role_id, secret_id=None):
+    def auth_approle(self, role_id, secret_id=None, mount_point='approle', use_token=True):
         """
         POST /auth/approle/login
         """
@@ -931,7 +936,8 @@ class Client(object):
         if secret_id is not None:
             params['secret_id'] = secret_id
 
-        return self._post('/v1/auth/approle/login', json=params).json()
+        return self.auth('/v1/auth/{0}/login'.format(mount_point), json=params,
+                         use_token=use_token).json()
 
     def close(self):
         """
