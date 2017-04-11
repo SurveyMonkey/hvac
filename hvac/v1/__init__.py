@@ -889,10 +889,13 @@ class Client(object):
 
     def get_role_secret_id_accessor(self, role_name, secret_id_accessor):
         """
-        GET /auth/approle/role/<role name>/secret-id-accessor/<secret_id_accessor>
+        POST /auth/approle/role/<role name>/secret-id-accessor/lookup
         """
-        url = '/v1/auth/approle/role/{0}/secret-id-accessor/{1}'.format(role_name, secret_id_accessor)
-        return self._get(url).json()
+        url = '/v1/auth/approle/role/{0}/secret-id-accessor/lookup'.format(role_name)
+        params = {
+            'secret_id_accessor': secret_id_accessor
+        }
+        return self._post(url, json=params).json()
 
     def delete_role_secret_id(self, role_name, secret_id):
         """
@@ -911,7 +914,7 @@ class Client(object):
         url = '/v1/auth/approle/role/{0}/secret-id-accessor/{1}'.format(role_name, secret_id_accessor)
         self._delete(url)
 
-    def create_role_custom_secret_id(self, role_name, secret_id, meta=None, cidr_list=None):
+    def create_role_custom_secret_id(self, role_name, secret_id, metadata=None, cidr_list=None):
         """
         POST /auth/approle/role/<role name>/custom-secret-id
         """
@@ -919,8 +922,8 @@ class Client(object):
         params = {
             'secret_id': secret_id
         }
-        if meta is not None:
-            params['meta'] = meta
+        if metadata is not None:
+            params['metadata'] = metadata
         if cidr_list is not None:
             params['cidr_list'] = cidr_list
 
